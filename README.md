@@ -12,8 +12,18 @@
   - `/home/runner/work/lunchmate/lunchmate/docs/branding/export-workflow.md`
 - Website/dashboard blueprint:
   - `/home/runner/work/lunchmate/lunchmate/docs/website/implementation-blueprint.md`
+- Next.js website + dashboard app:
+  - `/home/runner/work/lunchmate/lunchmate/web`
 
 ## Run Blender script
 ```bash
 blender --background --python /home/runner/work/lunchmate/lunchmate/lunchmate_logo_blender.py
+```
+
+## Run website
+```bash
+cd /home/runner/work/lunchmate/lunchmate/web
+cp .env.example .env.local
+npm install
+npm run dev
 ```

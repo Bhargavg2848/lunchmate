@@ -1,0 +1,10 @@
+<svg width="640" height="640" viewBox="0 0 640 640" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Lunchmate fallback logo">
+  <rect width="640" height="640" fill="#FBF6EC"/>
+  <g transform="translate(320 360)">
+    <ellipse cx="0" cy="140" rx="170" ry="30" fill="#E8C468" opacity="0.25"/>
+    <rect x="-120" y="30" width="240" height="90" rx="35" fill="#C9971F"/>
+    <rect x="-108" y="-45" width="216" height="85" rx="32" fill="#C9971F"/>
+    <path d="M-85 -55 Q0 -130 85 -55 L75 -40 Q0 -98 -75 -40 Z" fill="#E8C468"/>
+    <path d="M75 -28 Q190 -90 220 -10 Q130 -5 85 15 Z" fill="#2F6B4F"/>
+  </g>
+</svg>
