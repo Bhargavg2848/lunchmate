@@ -1,11 +1,14 @@
+"use client";
+
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import Image from "next/image";
 
 const ScrollModel = dynamic(() => import("@/components/landing/scroll-model"), {
   ssr: false,
   loading: () => (
     <div className="flex h-[460px] w-full items-center justify-center rounded-3xl border border-[#e8c468]/40 bg-white/70">
-      <img src="/lunchmate-fallback.svg" alt="Lunchmate fallback" className="h-[340px] w-[340px]" />
+      <Image src="/lunchmate-fallback.svg" alt="Lunchmate fallback" width={340} height={340} className="h-[340px] w-[340px]" />
     </div>
   ),
 });

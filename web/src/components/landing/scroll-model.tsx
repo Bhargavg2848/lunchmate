@@ -4,6 +4,7 @@ import { Component, Suspense, useEffect, useMemo, useRef, useState } from "react
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, OrbitControls, useGLTF } from "@react-three/drei";
 import { Group, MathUtils } from "three";
+import Image from "next/image";
 
 type ModelProps = { targetRotation: number };
 
@@ -76,15 +77,16 @@ class ModelErrorBoundary extends Component<
 
 export default function ScrollModel() {
   const [progress, setProgress] = useState(0);
-  const [useFallbackImage, setUseFallbackImage] = useState(false);
+  const lowMemory =
+    typeof navigator !== "undefined" &&
+    typeof (navigator as Navigator & { deviceMemory?: number }).deviceMemory === "number" &&
+    ((navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8) <= 4;
+  const prefersReducedMotion =
+    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const useFallbackImage = prefersReducedMotion || lowMemory;
 
   useEffect(() => {
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const lowMemory = typeof (navigator as Navigator & { deviceMemory?: number }).deviceMemory === "number"
-      && ((navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8) <= 4;
-
-    if (media.matches || lowMemory) {
-      setUseFallbackImage(true);
+    if (useFallbackImage) {
       return;
     }
 
@@ -97,13 +99,15 @@ export default function ScrollModel() {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [useFallbackImage]);
 
   if (useFallbackImage) {
     return (
-      <img
+      <Image
         src="/lunchmate-fallback.svg"
         alt="Lunchmate tiffin logo fallback"
+        width={360}
+        height={360}
         className="mx-auto h-[360px] w-[360px]"
       />
     );
