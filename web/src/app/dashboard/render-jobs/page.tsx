@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useDashboardAuth } from "@/components/dashboard/auth-provider";
 
 type RenderJob = {
@@ -21,7 +21,7 @@ export default function RenderJobsPage() {
   const [queueing, setQueueing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadJobs = async () => {
+  const loadJobs = useCallback(async () => {
     setLoading(true);
     const { data, error: fetchError } = await supabase
       .from("render_jobs")
@@ -38,11 +38,13 @@ export default function RenderJobsPage() {
     setJobs((data as RenderJob[]) ?? []);
     setError(null);
     setLoading(false);
-  };
+  }, [supabase]);
 
   useEffect(() => {
-    loadJobs();
-  }, []);
+    queueMicrotask(() => {
+      void loadJobs();
+    });
+  }, [loadJobs]);
 
   const queueJob = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

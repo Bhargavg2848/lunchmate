@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useDashboardAuth } from "@/components/dashboard/auth-provider";
 
 type OrderOption = {
@@ -14,7 +14,7 @@ type CustomerUpdate = {
   channel: string;
   created_at: string;
   order_id: string;
-  orders: { customer_name: string } | null;
+  orders: { customer_name: string }[] | null;
 };
 
 export default function CustomersPage() {
@@ -27,7 +27,7 @@ export default function CustomersPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     const [updatesRes, ordersRes] = await Promise.all([
       supabase
@@ -46,18 +46,18 @@ export default function CustomersPage() {
 
     const orderRows = ordersRes.data ?? [];
     setOrders(orderRows as OrderOption[]);
-    if (!orderId && orderRows.length > 0) {
-      setOrderId(orderRows[0].id);
-    }
+    setOrderId((currentOrderId) => (currentOrderId || orderRows.length === 0 ? currentOrderId : orderRows[0].id));
 
     setUpdates((updatesRes.data as CustomerUpdate[]) ?? []);
     setError(null);
     setLoading(false);
-  };
+  }, [supabase]);
 
   useEffect(() => {
-    loadData();
-  }, []);
+    queueMicrotask(() => {
+      void loadData();
+    });
+  }, [loadData]);
 
   const addUpdate = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -122,7 +122,7 @@ export default function CustomersPage() {
             <li key={update.id} className="rounded-lg border border-zinc-200 px-3 py-2">
               <p>{update.message}</p>
               <p className="mt-1 text-xs text-zinc-500">
-                {update.orders?.customer_name ?? "Unknown customer"} · {new Date(update.created_at).toLocaleString()}
+                {update.orders?.[0]?.customer_name ?? "Unknown customer"} · {new Date(update.created_at).toLocaleString()}
               </p>
             </li>
           ))}

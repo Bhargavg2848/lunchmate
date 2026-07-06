@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useDashboardAuth } from "@/components/dashboard/auth-provider";
 
 type MenuItem = {
@@ -21,7 +21,7 @@ export default function MenuPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadItems = async () => {
+  const loadItems = useCallback(async () => {
     setLoading(true);
     const { data, error: fetchError } = await supabase
       .from("menu_items")
@@ -37,11 +37,13 @@ export default function MenuPage() {
     setItems(data ?? []);
     setError(null);
     setLoading(false);
-  };
+  }, [supabase]);
 
   useEffect(() => {
-    loadItems();
-  }, []);
+    queueMicrotask(() => {
+      void loadItems();
+    });
+  }, [loadItems]);
 
   const createItem = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDashboardAuth } from "@/components/dashboard/auth-provider";
 
 type BrandingPreset = {
@@ -28,7 +28,7 @@ export default function BrandingPage() {
   const [error, setError] = useState<string | null>(null);
   const [activatingAssetId, setActivatingAssetId] = useState<string | null>(null);
 
-  const loadBrandingData = async () => {
+  const loadBrandingData = useCallback(async () => {
     setLoading(true);
     const [presetsRes, assetsRes] = await Promise.all([
       supabase.from("branding_presets").select("id,name,payload").order("created_at", { ascending: false }),
@@ -45,11 +45,13 @@ export default function BrandingPage() {
     setAssets((assetsRes.data as BrandAsset[]) ?? []);
     setError(null);
     setLoading(false);
-  };
+  }, [supabase]);
 
   useEffect(() => {
-    loadBrandingData();
-  }, []);
+    queueMicrotask(() => {
+      void loadBrandingData();
+    });
+  }, [loadBrandingData]);
 
   const activateAsset = async (asset: BrandAsset) => {
     setActivatingAssetId(asset.id);

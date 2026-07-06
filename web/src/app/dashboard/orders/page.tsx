@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDashboardAuth } from "@/components/dashboard/auth-provider";
 
 type OrderRow = {
@@ -19,7 +19,7 @@ export default function OrdersPage() {
   const [error, setError] = useState<string | null>(null);
   const [savingOrderId, setSavingOrderId] = useState<string | null>(null);
 
-  const loadOrders = async () => {
+  const loadOrders = useCallback(async () => {
     setLoading(true);
     const { data, error: fetchError } = await supabase
       .from("orders")
@@ -36,11 +36,13 @@ export default function OrdersPage() {
     setOrders((data as OrderRow[]) ?? []);
     setError(null);
     setLoading(false);
-  };
+  }, [supabase]);
 
   useEffect(() => {
-    loadOrders();
-  }, []);
+    queueMicrotask(() => {
+      void loadOrders();
+    });
+  }, [loadOrders]);
 
   const updateStatus = async (order: OrderRow, status: OrderRow["status"]) => {
     setSavingOrderId(order.id);
