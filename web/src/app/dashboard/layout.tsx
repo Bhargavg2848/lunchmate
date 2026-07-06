@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DashboardAuthProvider } from "@/components/dashboard/auth-provider";
 
 const nav = [
   ["Overview", "/dashboard"],
@@ -23,7 +24,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             ))}
           </nav>
         </aside>
-        <section className="space-y-4">{children}</section>
+        <section className="space-y-4">
+          <DashboardAuthProvider>{children}</DashboardAuthProvider>
+        </section>
       </div>
     </div>
   );
